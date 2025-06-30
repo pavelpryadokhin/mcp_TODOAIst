@@ -170,61 +170,6 @@ class CalDAVClient:
 
             event.save()
             return event
-        except Exception as e:
+        except (error.DAVError, AttributeError, ValueError) as e:
             logging.error(f"Failed to update event '{event_uid}': {e}")
             return None
-
-
-def test_caldav_locally():
-    """A function to test the CalDAVClient against a local server."""
-    from caldav_tool import settings
-
-    logging.info("--- Starting CalDAV Client Test ---")
-    try:
-        client = CalDAVClient(url='https://caldav.yandex.ru', username='pavel.pryadohin',
-                              password='fsvdlszzfmnjapvv')
-    except ConnectionError as e:
-        logging.error(f"Stopping test due to connection failure: {e}")
-        return
-
-    logging.info(f"Connected to principal: {client.principal}")
-    cal_id = None
-    try:
-        from datetime import datetime
-        start_date = datetime.strptime('2025-06-28 23:59', "%Y-%m-%d %H:%M")
-        end_date = datetime.strptime('2025-06-30 23:59', "%Y-%m-%d %H:%M")
-        # Create Calendar
-        calendar_name = f"new-name"
-        calendar_desc = "A test calendar for our client"
-        logging.info(f"Creating calendar: {calendar_name}")
-        # calendar = client.create_calendar(name=calendar_name, description=calendar_desc)
-        calendar = client.list_calendars()[0].id
-
-        event=client.list_events(calendar,start_date=start_date, end_date=end_date)
-        # print(client.create_event(calendar,summary="test_event",
-        #                           start=start_date, end=end_date,description="test_description"))
-        print(event[0].id)
-
-        ical = vobject.readOne(event[0].data)
-        uid = ical.vevent.uid.value
-        summary = ical.vevent.summary.value
-
-        print("UID:", uid)
-        print("Summary:", summary)
-        print(client.update_event(calendar,ical.vevent.uid.value,{'summary':"test_event_2"}))
-        # cal_id = calendar.id
-        logging.info(f"Calendar created with ID {cal_id}")
-        print(client.delete_event(calendar,uid))
-        print(client.list_events(calendar,start_date=start_date, end_date=end_date))
-        print(client.delete_calendar(calendar))
-
-    except AssertionError as e:
-        logging.error(f"Assertion FAILED: {e}")
-    except Exception as e:
-        logging.error(f"An unexpected error occurred during testing: {e}", exc_info=True)
-
-    logging.info("--- CalDAV Client Test Finished ---")
-
-
-if __name__ == "__main__":
-    test_caldav_locally() 
