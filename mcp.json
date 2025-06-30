@@ -1,0 +1,15 @@
+{
+    "mcpServers": {
+      "caldav_calendar": {
+        "command": "uv.exe",
+            "args": [
+        "run",
+        "--with",
+        "fastmcp",
+        "python",
+        "main.py"
+      ],
+        "description": "A tool for managing calendars and events on a CalDAV server. Allows for listing, creating, getting, updating, and deleting calendars and events."
+      }
+    }
+  }
